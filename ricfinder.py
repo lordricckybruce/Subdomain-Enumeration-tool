@@ -1,17 +1,15 @@
 #!/bin/python3
+import sys   # handles command line arguments
+import os    # check file existence
+import socket  # for network connection and DNS resolution
+from concurrent.futures import ThreadPoolExecutor  # enable concurrent processing
 
-import sys   #handles command line argument 
-import os   #check file existence
-import socket   # for network connection and also resolve DNS
-from concurrent.futures import ThreadPoolExecutor    #enable concurrent processing
 
-def resolve_subdomain(domain, subdomain):  # definde the function resolve_subdomain
-'''
-contruct full subdomain 
-return ip if found
-uses socket.gethostbyname to resolve  the subdomain to an ip
-'''
-    """Attempts to resolve a subdomain."""
+def resolve_subdomain(domain, subdomain):
+    """
+    Construct full subdomain and attempt to resolve it to an IP address.
+    Returns a tuple (full_domain, ip) if found, otherwise None.
+    """
     try:
         full_domain = f"{subdomain}.{domain}"
         ip = socket.gethostbyname(full_domain)
@@ -20,16 +18,23 @@ uses socket.gethostbyname to resolve  the subdomain to an ip
     except socket.gaierror:
         return None
 
-def load_wordlist(file_path):  #verifies that fille exist <wordlist>
-    """Loads subdomains from a wordlist file."""
+
+def load_wordlist(file_path):
+    """
+    Loads subdomains from a wordlist file.
+    Exits if the file does not exist.
+    """
     if not os.path.exists(file_path):
         print(f"Error: Wordlist file '{file_path}' not found.")
         sys.exit(1)
     with open(file_path, "r") as f:
         return [line.strip() for line in f if line.strip()]
 
+
 def main():
-    """Main function to handle input and subdomain enumeration."""
+    """
+    Main function to handle input arguments and perform subdomain enumeration.
+    """
     if len(sys.argv) != 3:
         print("Usage: python3 subdomain-tool.py <domain> <wordlist>")
         sys.exit(1)
@@ -50,8 +55,9 @@ def main():
         for result in results:
             if result:
                 f.write(f"{result[0]} -> {result[1]}\n")
+
     print("[*] Results saved to 'subdomains_found.txt'")
+
 
 if __name__ == "__main__":
     main()
-
